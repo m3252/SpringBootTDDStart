@@ -89,4 +89,53 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+
+    @DisplayName("username 속성이 지정되지 않으면 400 Bad Request 상태코드를 반환한다")
+    @Test
+    void test4(@Autowired TestRestTemplate client) {
+        // Arrange
+        var command = new CreateSellerCommand(
+            "seller@test.com",
+            null,
+            "password"
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signUp",
+            command,
+            Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @DisplayName("username 속성이 올바른 형식을 따르지 않으면 400 Bad Request 상태코드를 반환한다")
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "",
+        "se",
+        "seller ",
+        "seller!",
+        "seller@",
+    })
+    void test5(String username, @Autowired TestRestTemplate client) {
+        // Arrange
+        var command = new CreateSellerCommand(
+            "seller@test.com",
+            username,
+            "password"
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signUp",
+            command,
+            Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 }
