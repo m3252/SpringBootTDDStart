@@ -4,6 +4,8 @@ import commerce.CommerceApiApp;
 import commerce.command.CreateSellerCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -15,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     classes = CommerceApiApp.class,
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-@DisplayName("POST /api/sellers/signUp")
+@DisplayName("POST /api/seller/signUp")
 public class POST_specs {
 
     @Test
@@ -30,7 +32,7 @@ public class POST_specs {
 
         // Act
         ResponseEntity<Void> response = client.postForEntity(
-            "/sellers/signUp",
+            "/seller/signUp",
             command,
             Void.class
         );
@@ -51,7 +53,35 @@ public class POST_specs {
 
         // Act
         ResponseEntity<Void> response = client.postForEntity(
-            "/sellers/signUp",
+            "/seller/signUp",
+            command,
+            Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "plainaddress",
+        "missingusername@",
+        "missingusername@test",
+        "missingusername@test.",
+        "missingusername@.com",
+    })
+    @DisplayName("email 속성이 올바른 형식을 따르지 않으면 400 Bad Request 상태코드를 반환한다")
+    void test3(String email, @Autowired TestRestTemplate client) {
+        // Arrange
+        var command = new CreateSellerCommand(
+            email,
+            "seller",
+            "password"
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signUp",
             command,
             Void.class
         );

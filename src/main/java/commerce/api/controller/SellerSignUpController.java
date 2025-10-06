@@ -9,9 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public record SellerSignUpController() {
 
-    @PostMapping("/sellers/signUp")
+    @PostMapping("/seller/signUp")
     ResponseEntity<?> signUp(@RequestBody CreateSellerCommand command) {
+        String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
         if (command.email() == null) {
+            return ResponseEntity.badRequest().build();
+        } else if (!command.email().contains("@")) {
+            return ResponseEntity.badRequest().build();
+        } else if (command.email().endsWith("@")) {
+            return ResponseEntity.badRequest().build();
+        } else if (!command.email().matches(emailRegex)) {
             return ResponseEntity.badRequest().build();
         } else {
             return ResponseEntity.noContent().build();
