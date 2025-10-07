@@ -1,0 +1,4 @@
+  security:
+    jwt:
+      secret: 7e2b8c1a-4f3a-4c9e-9d2a-8f6b2e1c3a7d
+
