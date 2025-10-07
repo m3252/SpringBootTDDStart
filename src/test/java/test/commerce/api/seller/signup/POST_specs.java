@@ -138,4 +138,73 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+
+    @DisplayName("username 속성이 올바른 형식을 따르면 204 No Content 상태코드를 반환한다")
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "seller",
+        "ABDSFD",
+        "010111122222",
+        "seller_",
+        "seller-",
+    })
+    void test6(String username, @Autowired TestRestTemplate client) {
+        // Arrange
+        var command = new CreateSellerCommand(
+            "seller@test.com",
+            username,
+            "password"
+        );
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signUp",
+            command,
+            Void.class
+        );
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(204);
+    }
+
+    @DisplayName("password 속성이 지정되지 않으면 400 Bad Request 상태코드를 반환한다")
+    @Test
+    void test7(@Autowired TestRestTemplate client) {
+        // Arrange
+        var command = new CreateSellerCommand(
+            "seller@test.com",
+            "seller",
+            ""
+        );
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signUp",
+            command,
+            Void.class
+        );
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @DisplayName("password 속성이 올바른 형식을 따르지 않으면 400 Bad Request 상태코드를 반환한다")
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "",
+        "pass",
+        "passwor",
+    })
+    void test8(String password, @Autowired TestRestTemplate client) {
+        // Arrange
+        var command = new CreateSellerCommand(
+            "seller@test.com",
+            "seller",
+            password
+        );
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signUp",
+            command,
+            Void.class
+        );
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 }
