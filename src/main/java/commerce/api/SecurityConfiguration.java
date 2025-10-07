@@ -22,6 +22,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(
                 requests -> requests
                     .requestMatchers("/seller/signUp").permitAll()
+                    .requestMatchers("/seller/issueToken").permitAll()
             )
             .build();
     }
