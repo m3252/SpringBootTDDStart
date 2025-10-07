@@ -111,4 +111,47 @@ public class POST_specs {
         String actual = requireNonNull(response.getBody()).accessToken();
         assertThat(actual).satisfies(conformsToJwtFormat());
     }
+
+    @Test
+    @DisplayName("존재하지 않는 이메일 주소가 사용되면 400 Bad Request 상태코드를 반환한다")
+    void test4(@Autowired TestRestTemplate client) {
+        // Arrange
+        String email = EmailGenerator.generate();
+        String password = PasswordGenerator.generate();
+
+        // Act
+        ResponseEntity<AccessTokenCarrier> response = client.postForEntity(
+            "/seller/issueToken",
+            new IssueSellerToken(email, password),
+            AccessTokenCarrier.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @DisplayName("잘못된 비밀번호가 사용되면 400 Bad Request 상태코드를 반환한다")
+    @Test
+    void test5(@Autowired TestRestTemplate client) {
+        // Arrange
+        String email = EmailGenerator.generate();
+        String password = PasswordGenerator.generate();
+
+        client.postForObject(
+            "/seller/signUp",
+            new CreateSellerCommand(email, UsernameGenerator.generate(), password),
+            Void.class
+        );
+
+        // Act
+        String wrongPassword = PasswordGenerator.generate();
+        ResponseEntity<AccessTokenCarrier> response = client.postForEntity(
+            "/seller/issueToken",
+            new IssueSellerToken(email, wrongPassword),
+            AccessTokenCarrier.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 }
