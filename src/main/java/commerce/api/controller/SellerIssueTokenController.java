@@ -39,6 +39,7 @@ public record SellerIssueTokenController(
     private String composeToken() {
         return Jwts
             .builder()
+            .setSubject("seller")
             .signWith(jwtKeyHolder.key())
             .compact();
     }
