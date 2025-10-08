@@ -30,16 +30,16 @@ public record SellerIssueTokenController(
                 query.password(),
                 seller.getHashedPassword())
             )
-            .map(seller -> composeToken())
+            .map(this::composeToken)
             .map(AccessTokenCarrier::new)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
-    private String composeToken() {
+    private String composeToken(Seller seller) {
         return Jwts
             .builder()
-            .setSubject("seller")
+            .setSubject(seller.getId().toString())
             .signWith(jwtKeyHolder.key())
             .compact();
     }
