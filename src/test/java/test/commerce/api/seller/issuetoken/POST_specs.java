@@ -1,27 +1,23 @@
 package test.commerce.api.seller.issuetoken;
 
-import commerce.CommerceApiApp;
 import commerce.command.CreateSellerCommand;
 import commerce.query.IssueSellerToken;
 import commerce.result.AccessTokenCarrier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import test.commerce.EmailGenerator;
 import test.commerce.PasswordGenerator;
 import test.commerce.UsernameGenerator;
+import test.commerce.api.CommerceApiTest;
 
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.commerce.JwtAssertions.conformsToJwtFormat;
 
-@SpringBootTest(
-    classes = CommerceApiApp.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
+@CommerceApiTest
 @DisplayName("POST /seller/issueToken")
 public class POST_specs {
 
