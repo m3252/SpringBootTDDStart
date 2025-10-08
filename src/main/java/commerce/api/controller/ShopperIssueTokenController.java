@@ -2,10 +2,10 @@ package commerce.api.controller;
 
 import java.util.Optional;
 
-import commerce.Seller;
-import commerce.SellerRepository;
+import commerce.Shopper;
+import commerce.ShopperRepository;
 import commerce.api.JwtKeyHolder;
-import commerce.query.IssueSellerToken;
+import commerce.query.IssueShopperToken;
 import commerce.result.AccessTokenCarrier;
 import io.jsonwebtoken.Jwts;
 import org.springframework.http.ResponseEntity;
@@ -15,22 +15,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public record SellerIssueTokenController(
+public record ShopperIssueTokenController(
     JwtKeyHolder jwtKeyHolder,
     PasswordEncoder passwordEncoder,
-    SellerRepository sellerRepository
+    ShopperRepository shopperRepository
 ) {
 
-    @PostMapping("/seller/issueToken")
-    ResponseEntity<AccessTokenCarrier> issueToken(@RequestBody IssueSellerToken query) {
-        Optional<Seller> founded = sellerRepository.findByEmail(query.email());
+    @PostMapping("/shopper/issueToken")
+    ResponseEntity<AccessTokenCarrier> issueToken(@RequestBody IssueShopperToken query) {
+        Optional<Shopper> founded = shopperRepository.findByEmail(query.email());
 
         return founded
-            .filter(seller -> passwordEncoder.matches(
+            .filter(shopper -> passwordEncoder.matches(
                 query.password(),
-                seller.getHashedPassword())
+                shopper.getHashedPassword())
             )
-            .map(seller -> composeToken())
+            .map(shopper -> composeToken())
             .map(AccessTokenCarrier::new)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.badRequest().build());
