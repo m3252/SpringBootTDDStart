@@ -30,16 +30,16 @@ public record ShopperIssueTokenController(
                 query.password(),
                 shopper.getHashedPassword())
             )
-            .map(shopper -> composeToken())
+            .map(this::composeToken)
             .map(AccessTokenCarrier::new)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
-    private String composeToken() {
+    private String composeToken(Shopper shopper) {
         return Jwts
             .builder()
-            .setSubject("shopper")
+            .setSubject(shopper.getId().toString())
             .signWith(jwtKeyHolder.key())
             .compact();
     }

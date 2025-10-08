@@ -1,5 +1,6 @@
 package commerce.api.controller;
 
+import commerce.Seller;
 import commerce.Shopper;
 import commerce.ShopperRepository;
 import commerce.command.CreateShopperCommand;
@@ -9,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 import static commerce.UserPropertyValidator.isEmailValid;
 import static commerce.UserPropertyValidator.isPasswordValid;
@@ -26,7 +29,9 @@ public record ShopperSignUpController(
             return ResponseEntity.badRequest().build();
         }
 
+        UUID id = UUID.randomUUID();
         var shopper = new Shopper();
+        shopper.setId(id);
         shopper.setEmail(command.email());
         shopper.setUsername(command.username());
         String hashedPassword = passwordEncoder.encode(command.password());

@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @Setter
@@ -16,6 +18,9 @@ public class Shopper {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dataKey;
+
+    @Column(unique = true)
+    private UUID id;
 
     @Column(unique = true)
     private String email;

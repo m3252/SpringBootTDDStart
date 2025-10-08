@@ -11,8 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(
-    classes = CommerceApiApp.class,
+    classes = { CommerceApiApp.class, TestFixtureConfiguration.class },
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
+
 public @interface CommerceApiTest {
 }
