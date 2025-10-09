@@ -1,29 +1,25 @@
 package commerce.api.controller;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.UUID;
 
-import commerce.SellerRepository;
 import commerce.command.RegisterProductCommand;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public record SellerProductsController(SellerRepository sellerRepository) {
+public record SellerProductsController() {
 
     @PostMapping("/seller/products")
     ResponseEntity<?> registerProduct(
         Principal user,
         @RequestBody RegisterProductCommand command
     ) {
-        UUID id = UUID.fromString(user.getName());
-        if (sellerRepository.findById(id).isEmpty()) {
-            return ResponseEntity.status(403).build();
-        } else if (!isValidUri(command.imageUri())) {
+        if (!isValidUri(command.imageUri())) {
             return ResponseEntity.badRequest().body("Invalid image URI");
         }
 
@@ -39,4 +35,10 @@ public record SellerProductsController(SellerRepository sellerRepository) {
             return false;
         }
     }
+
+    @GetMapping("/seller/products/{id}")
+    ResponseEntity<?> findProduct(Principal user) {
+        return ResponseEntity.ok().build();
+    }
+
 }

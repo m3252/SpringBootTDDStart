@@ -12,6 +12,8 @@ import org.springframework.security.web.DefaultSecurityFilterChain;
 
 import javax.crypto.spec.SecretKeySpec;
 
+import static org.springframework.security.oauth2.core.authorization.OAuth2AuthorizationManagers.hasScope;
+
 @Configuration
 public class SecurityConfiguration {
 
@@ -41,7 +43,7 @@ public class SecurityConfiguration {
                 requests -> requests
                     .requestMatchers("/seller/signUp").permitAll()
                     .requestMatchers("/seller/issueToken").permitAll()
-                    .requestMatchers("/seller/me").authenticated()
+                    .requestMatchers("/seller/**").access(hasScope("seller"))
                     .requestMatchers("/shopper/signUp").permitAll()
                     .requestMatchers("/shopper/issueToken").permitAll()
                     .anyRequest().authenticated()

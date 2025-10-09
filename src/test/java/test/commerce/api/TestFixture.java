@@ -7,10 +7,17 @@ import commerce.result.AccessTokenCarrier;
 import org.springframework.boot.test.web.client.LocalHostUriTemplateHandler;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import test.commerce.EmailGenerator;
 import test.commerce.PasswordGenerator;
 import test.commerce.UsernameGenerator;
+
+import java.net.URI;
+import java.util.UUID;
+
+import static java.util.Objects.requireNonNull;
+import static test.commerce.RegisterProductCommandGenerator.generateRegisterProductCommand;
 
 public record TestFixture(TestRestTemplate client) {
 
@@ -92,5 +99,18 @@ public record TestFixture(TestRestTemplate client) {
         String username = UsernameGenerator.generate();
         createShopper(email, username, password);
         setShopperAsDefaultUser(email, password);
+    }
+
+    public UUID registerProduct() {
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/products",
+            generateRegisterProductCommand(),
+            Void.class
+        );
+
+        URI location = response.getHeaders().getLocation();
+        String path = requireNonNull(location).getPath();
+        String id = path.substring("/seller/products/".length());
+        return UUID.fromString(id);
     }
 }
