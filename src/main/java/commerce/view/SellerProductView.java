@@ -1,4 +1,4 @@
-package commerce.command;
+package commerce.view;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
