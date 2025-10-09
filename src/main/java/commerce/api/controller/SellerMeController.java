@@ -1,7 +1,6 @@
 package commerce.api.controller;
 
 import java.security.Principal;
-import java.util.Optional;
 import java.util.UUID;
 
 import commerce.Seller;

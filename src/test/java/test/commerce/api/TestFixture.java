@@ -4,13 +4,22 @@ import commerce.command.CreateShopperCommand;
 import commerce.query.IssueSellerToken;
 import commerce.query.IssueShopperToken;
 import commerce.result.AccessTokenCarrier;
+import org.springframework.boot.test.web.client.LocalHostUriTemplateHandler;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
 import test.commerce.EmailGenerator;
 import test.commerce.PasswordGenerator;
 import test.commerce.UsernameGenerator;
 
 public record TestFixture(TestRestTemplate client) {
+
+    public static TestFixture create(Environment environment) {
+        var client = new TestRestTemplate();
+        var handler = new LocalHostUriTemplateHandler(environment);
+        client.setUriTemplateHandler(handler);
+        return new TestFixture(client);
+    }
 
     public void createShopper(String email, String username, String password) {
         var command = new CreateShopperCommand(email, username, password);
