@@ -2,17 +2,22 @@ package commerce.api.controller;
 
 import java.net.URI;
 import java.security.Principal;
+import java.util.Optional;
 import java.util.UUID;
 
+import commerce.Product;
+import commerce.ProductRepository;
 import commerce.command.RegisterProductCommand;
+import commerce.command.SellerProductView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public record SellerProductsController() {
+public record SellerProductsController(ProductRepository productRepository) {
 
     @PostMapping("/seller/products")
     ResponseEntity<?> registerProduct(
@@ -22,8 +27,13 @@ public record SellerProductsController() {
         if (!isValidUri(command.imageUri())) {
             return ResponseEntity.badRequest().body("Invalid image URI");
         }
+        UUID id = UUID.randomUUID();
+        Product product = new Product();
+        product.setId(id);
+        product.setSellerId(UUID.fromString(user.getName()));
+        productRepository.save(product);
 
-        URI location =  URI.create("/seller/products/" + UUID.randomUUID());
+        URI location =  URI.create("/seller/products/" + id);
         return ResponseEntity.created(location).build();
     }
 
@@ -37,8 +47,12 @@ public record SellerProductsController() {
     }
 
     @GetMapping("/seller/products/{id}")
-    ResponseEntity<?> findProduct(Principal user) {
-        return ResponseEntity.ok().build();
+    ResponseEntity<?> findProduct(@PathVariable UUID id, Principal user) {
+        UUID sellerId = UUID.fromString(user.getName());
+        return productRepository.findById(id)
+                .filter(product -> product.getSellerId().equals(sellerId))
+                .map(product -> ResponseEntity.ok().build())
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 }

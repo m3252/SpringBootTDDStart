@@ -1,5 +1,6 @@
 package test.commerce.api.seller.products.id;
 
+import commerce.Seller;
 import commerce.command.SellerProductView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,9 +47,38 @@ public class GET_specs {
         assertThat(response.getStatusCode().value()).isEqualTo(403);
     }
 
-//     @DisplayName("존재하지 않는 상품 식별자를 사용하면 404 Not Found 상태코드를 반환한다");
-//     @DisplayName("다른 판매자가 등록한 상품 식별자를 사용하면 404 Not Found 상태코드를 반환한다");
-//     @DisplayName("상품 식별자를 올바르게 반환한다");
-//     @DisplayName("상품 정보를 올바르게 반환한다");
-//     @DisplayName("상품 등록 시각을 올바르게 반환한다");
+    @DisplayName("존재하지 않는 상품 식별자를 사용하면 404 Not Found 상태코드를 반환한다")
+    @Test
+    void test3(@Autowired TestFixture fixture) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        fixture.registerProduct();
+
+        UUID nonExistentId = UUID.randomUUID();
+
+        // Act
+        ResponseEntity<?> response = fixture.client().getForEntity("/seller/products/{id}", SellerProductView.class, nonExistentId);
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(404);
+    }
+
+     @DisplayName("다른 판매자가 등록한 상품 식별자를 사용하면 404 Not Found 상태코드를 반환한다")
+    @Test
+    void test4(@Autowired TestFixture fixture) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        UUID id = fixture.registerProduct();
+
+        fixture.createSellerThenSetAsDefaultUser();
+
+        // Act
+        ResponseEntity<?> response = fixture.client().getForEntity("/seller/products/{id}", SellerProductView.class, id);
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(404);
+     }
+//     @DisplayName("상품 식별자를 올바르게 반환한다")
+//     @DisplayName("상품 정보를 올바르게 반환한다")
+//     @DisplayName("상품 등록 시각을 올바르게 반환한다")
 }
