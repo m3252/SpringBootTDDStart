@@ -1,6 +1,7 @@
 package test.commerce.api;
 
 import commerce.command.CreateShopperCommand;
+import commerce.query.IssueSellerToken;
 import commerce.query.IssueShopperToken;
 import commerce.result.AccessTokenCarrier;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -35,12 +36,52 @@ public record TestFixture(TestRestTemplate client) {
 
     public void setShopperAsDefaultUser(String email, String password) {
         String token = issueShopperToken(email, password);
+        setDefaultAuthorization(token);
+    }
+
+    private void setDefaultAuthorization(String token) {
         RestTemplate restTemplate = client.getRestTemplate();
-        restTemplate.getInterceptors().add((request, body, execution) -> {
+        restTemplate.getInterceptors().addFirst((request, body, execution) -> {
             if (!request.getHeaders().containsKey("Authorization")) {
                 request.getHeaders().setBearerAuth(token);
             }
             return execution.execute(request, body);
         });
+    }
+
+    public void createSellerThenSetAsDefaultUser() {
+        String email = EmailGenerator.generate();
+        String password = PasswordGenerator.generate();
+        String username = UsernameGenerator.generate();
+        createSeller(email, username, password);
+        setSellerAsDefaultUser(email, password);
+    }
+
+    private void createSeller(String email, String username, String password) {
+        CreateShopperCommand command = new CreateShopperCommand(email, username, password);
+        client.postForEntity("/seller/signUp", command, Void.class);
+    }
+
+    private void setSellerAsDefaultUser(String email, String password) {
+        String token = issueSellerToken(email, password);
+        setDefaultAuthorization(token);
+    }
+
+    private String issueSellerToken(String email, String password) {
+        AccessTokenCarrier carrier = client.postForObject(
+            "/seller/issueToken",
+            new IssueSellerToken(email, password),
+            AccessTokenCarrier.class
+        );
+
+        return carrier.accessToken();
+    }
+
+    public void createShopperThenAsDefaultUser() {
+        String email = EmailGenerator.generate();
+        String password = PasswordGenerator.generate();
+        String username = UsernameGenerator.generate();
+        createShopper(email, username, password);
+        setShopperAsDefaultUser(email, password);
     }
 }
