@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import static java.time.ZoneOffset.UTC;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
 
 @RestController
 public record SellerProductsController(ProductRepository repository) {
@@ -63,35 +65,31 @@ public record SellerProductsController(ProductRepository repository) {
         return repository
             .findById(id)
             .filter(product -> product.getSellerId().equals(sellerId))
-            .map(product -> new SellerProductView(
-                product.getId(),
-                product.getName(),
-                product.getImageUri(),
-                product.getDescription(),
-                product.getPriceAmount(),
-                product.getStockQuantity(),
-                product.getRegisteredTimeUtc()
-            ))
+            .map(SellerProductsController::convertToView)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/seller/products")
     ResponseEntity<?> getProducts(Principal user) {
-        SellerProductView[] items = repository.findAll()
+        SellerProductView[] items = repository.findBySellerId(UUID.fromString(user.getName()))
             .stream()
-            .filter(product -> product.getSellerId().equals(UUID.fromString(user.getName())))
-            .map(product -> new SellerProductView(
-                product.getId(),
-                product.getName(),
-                product.getImageUri(),
-                product.getDescription(),
-                product.getPriceAmount(),
-                product.getStockQuantity(),
-                product.getRegisteredTimeUtc()
-            ))
+            .sorted(comparing(Product::getRegisteredTimeUtc, reverseOrder()))
+            .map(SellerProductsController::convertToView)
             .toArray(SellerProductView[]::new);
 
         return ResponseEntity.ok(new ArrayCarrier<>(items));
+    }
+
+    private static SellerProductView convertToView(Product product) {
+        return new SellerProductView(
+            product.getId(),
+            product.getName(),
+            product.getImageUri(),
+            product.getDescription(),
+            product.getPriceAmount(),
+            product.getStockQuantity(),
+            product.getRegisteredTimeUtc()
+        );
     }
 }
