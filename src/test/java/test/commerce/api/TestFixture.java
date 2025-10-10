@@ -15,6 +15,7 @@ import test.commerce.PasswordGenerator;
 import test.commerce.UsernameGenerator;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.requireNonNull;
@@ -116,5 +117,9 @@ public record TestFixture(TestRestTemplate client) {
         String path = requireNonNull(location).getPath();
         String id = path.substring("/seller/products/".length());
         return UUID.fromString(id);
+    }
+
+    public List<UUID> registerProducts() {
+        return List.of(registerProduct(), registerProduct(), registerProduct());
     }
 }

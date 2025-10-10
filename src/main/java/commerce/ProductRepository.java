@@ -1,11 +1,11 @@
 package commerce;
 
-import org.springframework.data.repository.CrudRepository;
-
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ProductRepository extends CrudRepository<Product, Long> {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findById(UUID id);
 }
