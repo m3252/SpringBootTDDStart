@@ -42,7 +42,15 @@ public record TestFixture(
 
     public void createShopper(String email, String username, String password) {
         var command = new CreateShopperCommand(email, username, password);
-        client.postForEntity("/shopper/signUp", command, Void.class);
+        ensureSuccessful(
+        client.postForEntity("/shopper/signUp", command, Void.class)
+            , command);
+    }
+
+    private void ensureSuccessful(ResponseEntity<Void> response, CreateShopperCommand command) {
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new IllegalStateException("Failed to create shopper: " + command);
+        }
     }
 
     public String issueShopperToken(String email, String password) {
