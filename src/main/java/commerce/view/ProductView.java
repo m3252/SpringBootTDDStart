@@ -1,5 +1,6 @@
 package commerce.view;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public record ProductView(
@@ -8,7 +9,7 @@ public record ProductView(
     String name,
     String imageUri,
     String description,
-    String priceAmount,
+    BigDecimal priceAmount,
     int stockQuantity
 ) {
 }

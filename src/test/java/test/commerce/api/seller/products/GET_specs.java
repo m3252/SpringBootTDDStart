@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 
 import commerce.command.RegisterProductCommand;
 import commerce.view.ArrayCarrier;
+import commerce.view.ProductView;
 import commerce.view.SellerProductView;
 import org.assertj.core.api.ThrowingConsumer;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
+import test.commerce.ProductAssertion;
 import test.commerce.api.CommerceApiTest;
 import test.commerce.api.TestFixture;
 
@@ -110,7 +112,7 @@ public class GET_specs {
         // Assert
         ArrayCarrier<SellerProductView> body = response.getBody();
         SellerProductView actual = requireNonNull(body).items()[0];
-        assertThat(actual).satisfies(ProductAssertions.isDerivedFrom(command));
+        assertThat(actual).satisfies(ProductAssertion.isDerivedFrom(command));
     }
 
     @DisplayName("상품 등록 시각을 올바르게 반환한다")
@@ -156,23 +158,3 @@ public class GET_specs {
     }
 }
 
-class ProductAssertions {
-
-    public static ThrowingConsumer<SellerProductView> isDerivedFrom(
-        RegisterProductCommand command
-    ) {
-        return product -> {
-            assertThat(product.name()).isEqualTo(command.name());
-            assertThat(product.imageUri()).isEqualTo(command.imageUri());
-            assertThat(product.description()).isEqualTo(command.description());
-            assertThat(product.priceAmount())
-                .matches(equals(command.priceAmount()));
-            assertThat(product.stockQuantity())
-                .isEqualTo(command.stockQuantity());
-        };
-    }
-
-    private static Predicate<? super BigDecimal> equals(BigDecimal expected) {
-        return actual -> actual.compareTo(expected) == 0;
-    }
-}

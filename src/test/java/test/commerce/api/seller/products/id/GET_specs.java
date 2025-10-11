@@ -46,7 +46,7 @@ public class GET_specs {
         fixture.createSellerThenSetAsDefaultUser();
         UUID id = fixture.registerProduct();
 
-        fixture.createShopperThenAsDefaultUser();
+        fixture.createShopperThenSetAsDefaultUser();
 
         // Act
         ResponseEntity<?> response = fixture.client().getForEntity("/seller/products/{id}", SellerProductView.class, id);
