@@ -40,6 +40,7 @@ public record ShopperIssueTokenController(
         return Jwts
             .builder()
             .setSubject(shopper.getId().toString())
+            .claim("scp", "shopper")
             .signWith(jwtKeyHolder.key())
             .compact();
     }
