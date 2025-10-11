@@ -65,7 +65,7 @@ public class GET_specs {
         UUID nonExistentId = UUID.randomUUID();
 
         // Act
-        ResponseEntity<?> response = fixture.client().getForEntity("/seller/products/{id}", SellerProductView.class, nonExistentId);
+        ResponseEntity<?> response = fixture.client().getForEntity("/seller/products" + nonExistentId, SellerProductView.class);
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(404);
@@ -81,7 +81,7 @@ public class GET_specs {
         fixture.createSellerThenSetAsDefaultUser();
 
         // Act
-        ResponseEntity<?> response = fixture.client().getForEntity("/seller/products/{id}", SellerProductView.class, id);
+        ResponseEntity<?> response = fixture.client().getForEntity("/seller/products" + id, SellerProductView.class);
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(404);

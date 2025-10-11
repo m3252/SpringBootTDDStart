@@ -1,4 +1,4 @@
-package commerce.api.controller;
+package commerce.querymodel;
 
 import commerce.Product;
 import commerce.Seller;
